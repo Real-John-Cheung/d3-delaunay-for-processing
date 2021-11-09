@@ -71,6 +71,22 @@ public class Delaunay {
         return new Delaunay(dPoints);
     }
 
+    public Delaunay(double[][] points) {
+        DPoint[] dps = new DPoint[points.length];
+        for (int i = 0; i < dps.length; i++) {
+            dps[i] = new DPoint(points[i][0], points[i][1]);
+        }
+        this._delaunator = new Delaunator(dps);
+        this.indeges = new int[dps.length / 2];
+        this._hullIndex = new int[dps.length / 2];
+        DPoint[] dPoints = this._delaunator.points;
+        for (int i = 0; i < dPoints.length; i++) {
+            this.points[2 * i] = dPoints[i].x;
+            this.points[2 * i + 1] = dPoints[i].y;
+        }
+        this._init();
+    }
+
     public Delaunay(DPoint[] points) {
         this._delaunator = new Delaunator(points);
         this.indeges = new int[points.length / 2];
