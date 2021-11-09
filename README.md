@@ -5,7 +5,7 @@ using the [delaunator-java library by waveware4ai](https://github.com/waveware4a
 <hr>
 
 ## Usage
-You can download the packaged <code>.jar</code> file from the release, then import them into processing as a library.(<b>You might need the newest version of Processing 4 to use this library</b> That's because this library is compiled with recent Java runtime -- my bad, I thought processing 4 was already using Java 17). 
+You can download the packaged <code>.jar</code> file from the release, then import them into processing as a library.(<b>But sadly, now it doesn't really work yet</b> That's because this library is compiled with recent Java runtime -- my bad, I thought processing 4 was already using Java 17.I will fix that when I have time, or you can also make a pull request if you wanna help, thanks in advance). 
 Or you can also build it from source. As you can see, I am using gradle to package it. To do so:<br>
 clone the repo to your machine:<br><code> git clone https://github.com/Real-John-Cheung/d3-delaunay-for-processing.git </code><br>
 after that, you can make some change according to your needs and run
