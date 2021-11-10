@@ -20,15 +20,15 @@ This library, just like the JS one, provides two new class.
 
 ## Delaunay
 
-### <i>static</i> Delaunay.from(double[] points)
+### <i>static</i> Delaunay.from(double[][] points)
 
-This method return a new Delaunay instant from a double array like this [x0, y0, x1, y1, ...]
+This method return a new Delaunay instant from a double[][] array like this [ [x0, y0] , [ x1, y1] , ...]
 
 <b>Return type: Delaunay</b>
 
-### <i>constructor</i> Delaunay(double[][]) 
+### <i>constructor</i> Delaunay(double[] points) 
 
-This is the recommanded way to create a new Delaunay instant. It accepts a 2D double array like this[[ x0, y0 ],[ x1, y1 ] ...]
+This is the recommanded way to create a new Delaunay instant. It accepts a 2D double array like this[x0, y0, x1, y1 , ...]
 
 <b>Return type: Delaunay</b>
 

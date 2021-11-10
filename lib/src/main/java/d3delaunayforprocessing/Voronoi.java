@@ -9,8 +9,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
-import com.google.common.primitives.Doubles;
+import javax.swing.text.html.StyleSheet;
 
 import java.util.Comparator;
 import org.waveware.delaunator.Delaunator;
@@ -141,13 +143,13 @@ public class Voronoi {
 
     public void renderCell(int i, Polygon context) {
         double[] points = this._clip(i);
-        if (points == null || points.length < 1)
+        if (points == null || points.length < 2)
             return;
         context.moveTo(points[0], points[1]);
         int n = points.length;
         while (points[0] == points[n - 2] && points[1] == points[n - 1] && n > 1)
             n -= 2;
-        for (int j = 0; j < n; j++) {
+        for (int j = 2; j < n; j += 2) {
             if (points[j] != points[j - 2] || points[j + 1] != points[j - 1])
                 context.lineTo(points[j], points[j + 1]);
         }
@@ -230,14 +232,12 @@ public class Voronoi {
                     this.ymin };
         }
         double[] points = this._cell(i);
-        if (points == null)
-            return null;
+        if (points == null || points.length < 1) return null;
         double[] V = this.vectors;
         int v = i * 4;
-        if (v < 0 || v >= V.length)
-            return this._clipFinite(i, points);
-        if (V[v] != 0 || V[v + 1] != 0)
+        if (((v > 0 && v < V.length) && V[v] != 0) || ((v + 1 > 0 && v + 1 < V.length) && V[v + 1] != 0)) {
             return this._clipInfinite(i, points, V[v], V[v + 1], V[v + 2], V[v + 3]);
+        }
         return this._clipFinite(i, points);
     }
 
@@ -262,7 +262,7 @@ public class Voronoi {
             if (c0 == 0 && c1 == 0) {
                 e0 = e1;
                 e1 = 0;
-                if (P != null) {
+                if (P != null && P.size() > 0) {
                     P.add(x1);
                     P.add(y1);
                 } else {
@@ -278,25 +278,22 @@ public class Voronoi {
                 double sy1;
                 if (c0 == 0) {
                     S = this._clipSegment(x0, y0, x1, y1, c0, c1);
-                    if (S == null)
-                        continue;
+                    if (S == null) continue;
                     sx0 = S[0];
                     sy0 = S[1];
                     sx1 = S[2];
                     sy1 = S[3];
                 } else {
                     S = this._clipSegment(x1, y1, x0, y0, c1, c0);
-                    if (S == null)
-                        continue;
+                    if (S == null) continue;
                     sx1 = S[0];
                     sy1 = S[1];
                     sx0 = S[2];
                     sy0 = S[3];
                     e0 = e1;
                     e1 = this._edgecode(sx0, sy0);
-                    if (e0 != 0 && e1 != 0)
-                        this._edge(i, e0, e1, P, P.size());
-                    if (P != null) {
+                    if (e0 != 0 && e1 != 0) this._edge(i, e0, e1, P, P.size());
+                    if (P != null && P.size() > 0) {
                         P.add(sx0);
                         P.add(sy0);
                     } else {
@@ -307,9 +304,8 @@ public class Voronoi {
                 }
                 e0 = e1;
                 e1 = this._edgecode(sx1, sy1);
-                if (e0 != 0 && e1 != 0)
-                    this._edge(i, e0, e1, P, P.size());
-                if (P != null) {
+                if (e0 != 0 && e1 != 0) this._edge(i, e0, e1, P, P.size());
+                if (P != null && P.size() > 0) {
                     P.add(sx1);
                     P.add(sy1);
                 } else {
@@ -319,11 +315,10 @@ public class Voronoi {
                 }
             }
         }
-        if (P != null) {
+        if (P != null && P.size() > 1) {
             e0 = e1;
             e1 = this._edgecode(P.get(0), P.get(1));
-            if (e0 != 0 && e1 != 0)
-                this._edge(i, e0, e1, P, P.size());
+            if (e0 != 0 && e1 != 0) this._edge(i, e0, e1, P, P.size());
         } else if (this.contains(i, (this.xmin + this.xmax) / 2, (this.ymin + this.ymax) / 2)) {
             return new double[] { this.xmax, this.ymin, this.xmax, this.ymax, this.xmin, this.ymax, this.xmin,
                     this.ymin };
@@ -333,10 +328,8 @@ public class Voronoi {
 
     public double[] _clipSegment(double x0, double y0, double x1, double y1, int c0, int c1) {
         while (true) {
-            if (c0 == 0 && c1 == 0)
-                return new double[] { x0, y0, x1, y1 };
-            if ((c0 & c1) != 0)
-                return null;
+            if (c0 == 0 && c1 == 0) return new double[] { x0, y0, x1, y1 };
+            if ((c0 & c1) != 0) return null;
             double x;
             double y;
             int c = c0 == 0 ? c1 : c0;
@@ -366,26 +359,26 @@ public class Voronoi {
     }
 
     public double[] _clipInfinite(int i, double[] points, double vx0, double vy0, double vxn, double vyn) {
-        List<Double> P = Doubles.asList(points.clone());
+        List<Double> P = DoubleStream.of(points.clone()).boxed().collect(Collectors.toList());
         double[] p = null;
         p = this._project(P.get(0), P.get(1), vx0, vy0);
-        if (p != null) {
+        if (p != null && p.length > 1) {
             P.add(0, p[1]);
             P.add(0, p[0]);
         }
         p = this._project(P.get(P.size() - 2), P.get(P.size() - 1), vxn, vyn);
-        if (P != null) {
+        if (p != null && p.length > 1) {
             P.add(p[0]);
             P.add(p[1]);
         }
-        P = Doubles.asList(this._clipFinite(i, P.stream().mapToDouble(d -> d).toArray()));
-        if (P != null) {
+        P = DoubleStream.of(this._clipFinite(i, P.stream().mapToDouble(d -> d).toArray())).boxed().collect(Collectors.toList());
+        if (P != null && P.size() > 1) {
             int n = P.size();
             int c0;
             int c1 = this._edgecode(P.get(n - 2), P.get(n - 1));
             for (int j = 0; j < n; j += 2) {
                 c0 = c1;
-                c1 = this._edgecode(P.get(j), P.get(j + i));
+                c1 = this._edgecode(P.get(j), P.get(j + 1));
                 if (c0 != 0 && c1 != 0) {
                     j = this._edge(i, c0, c1, P, j);
                     n = P.size();
@@ -440,7 +433,14 @@ public class Voronoi {
                 y = 0;
                 break;
             }
-            if ((P.get(j) != x || P.get(j + 1) != y) && this.contains(i, x, y)) {
+            // if P[j] or P[j+1] are undefined, the conditional statement should be executed.
+            if ((j < 0 || j >= P.size()) || (j + 1 < 0 || j + 1 >= P.size())) {
+                if (this.contains(i, x, y)) {
+                    P.add(j, y);
+                    P.add(j, x);
+                    j += 2;
+                }
+            } else if ((P.get(j) != x || P.get(j + 1) != y) && this.contains(i, x, y)) {
                 P.add(j, y);
                 P.add(j, x);
                 j += 2;
@@ -450,10 +450,13 @@ public class Voronoi {
             for (int j2 = 0; j2 < P.size(); j2 += 2) {
                 int j3 = (i + 2) % P.size();
                 int k = (i + 4) % P.size();
+                if ((j2 < 0 || j2 > P.size() - 1) || (j3 < 0 || j3 > P.size() - 1) || (k < 0 || k > P.size() - 1)) continue;
+                if ((j2 + 1 < 0 || j2 + 1 > P.size() - 1) || (j3 + 1 < 0 || j3 + 1 > P.size() - 1) || (k + 1 < 0 || k + 1 > P.size() - 1)) continue;
                 if ((P.get(j2) == P.get(j3) && P.get(j3) == P.get(k))
                         || (P.get(j2 + 1) == P.get(j3 + 1) && P.get(j3 + 1) == P.get(k + 1))) {
                     P.remove(j3);
                     P.remove(j3);
+                    j2 -= 2;
                 }
             }
         }

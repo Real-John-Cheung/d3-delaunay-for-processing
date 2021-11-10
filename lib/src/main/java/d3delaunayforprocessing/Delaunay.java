@@ -63,32 +63,21 @@ public class Delaunay {
         return new double[] { x + Math.sin(x + y), y + Math.cos(x - y) * r };
     }
 
-    static public Delaunay from(double[] points) {
-        DPoint[] dPoints = new DPoint[points.length / 2];
-        for (int i = 0; i < points.length; i += 2) {
-            dPoints[i] = new DPoint(points[i], points[i + 1]);
+    static public Delaunay from(double[][] points) {
+        double[] flatArr = new double[points.length * 2];
+        for (int i = 0; i < points.length; i ++) {
+            flatArr[i * 2] = points[i][0];
+            flatArr[i * 2 + 1] = points[i][1];
         }
-        return new Delaunay(dPoints);
+        return new Delaunay(flatArr);
     }
 
-    public Delaunay(double[][] points) {
-        DPoint[] dps = new DPoint[points.length];
+    public Delaunay(double[] points) {
+        DPoint[] dps = new DPoint[points.length / 2];
         for (int i = 0; i < dps.length; i++) {
-            dps[i] = new DPoint(points[i][0], points[i][1]);
+            dps[i] = new DPoint(points[i * 2], points[i * 2 + 1]);
         }
         this._delaunator = new Delaunator(dps);
-        this.indeges = new int[dps.length / 2];
-        this._hullIndex = new int[dps.length / 2];
-        DPoint[] dPoints = this._delaunator.points;
-        for (int i = 0; i < dPoints.length; i++) {
-            this.points[2 * i] = dPoints[i].x;
-            this.points[2 * i + 1] = dPoints[i].y;
-        }
-        this._init();
-    }
-
-    public Delaunay(DPoint[] points) {
-        this._delaunator = new Delaunator(points);
         this.indeges = new int[points.length / 2];
         this._hullIndex = new int[points.length / 2];
         DPoint[] dPoints = this._delaunator.points;
@@ -142,10 +131,12 @@ public class Delaunay {
         } else {
             this.collinear = null;
         }
-
-        int[] halfedges = this.halfedges = this._delaunator.halfedges;
-        int[] hull = this.hull = this._delaunator.hull;
-        int[] triangles = this.triangles = this._delaunator.triangles;
+        this.halfedges = this._delaunator.halfedges;
+        int[] halfedges = this.halfedges;
+        this.hull = this._delaunator.hull;
+        int[] hull = this.hull;
+        this.triangles = this._delaunator.triangles;
+        int[] triangles = this.triangles;
         for (int i = 0; i < this.indeges.length; i++) {
             this.indeges[i] = -1;
         }
@@ -154,7 +145,8 @@ public class Delaunay {
             this._hullIndex[i] = -1;
         }
         int[] hullIndex = this._hullIndex;
-        for (int e = 0; e < halfedges.length; e++) {
+        int n = halfedges.length;
+        for (int e = 0; e < n; ++e) {
             int p = triangles[e % 3 == 2 ? e - 2 : e + 1];
             if (halfedges[e] == -1 || indeges[p] == -1)
                 indeges[p] = e;
@@ -162,7 +154,6 @@ public class Delaunay {
         for (int i = 0; i < hull.length; i++) {
             hullIndex[hull[i]] = i;
         }
-
         if (hull.length <= 2 && hull.length > 0) {
             this.triangles = new int[] { -1, -1, -1 };
             this.halfedges = new int[] { -1, -1, -1 };
@@ -245,8 +236,7 @@ public class Delaunay {
         int[] halfedges = this.halfedges;
         int[] triangles = this.triangles;
         double points[] = this.points;
-        if (indeges[i] == -1 || points.length == 0)
-            return (i + 1) % (points.length >> 1);
+        if (indeges[i] == -1 || points.length == 0) return (i + 1) % (points.length >> 1);
         int c = i;
         double dc = Math.pow(x - points[i * 2], 2) + Math.pow(y - points[i * 2 + 1], 2);
         int e0 = indeges[i];
@@ -259,14 +249,12 @@ public class Delaunay {
                 c = t;
             }
             e = e % 3 == 2 ? e - 2 : e + 1;
-            if (triangles[e] != i)
-                break;
+            if (triangles[e] != i)  break;
             e = halfedges[e];
             if (e == -1) {
                 e = hull[(_hullIndex[i] + 1) % hull.length];
                 if (e != t) {
-                    if (Math.pow(x - points[e * 2], 2) + Math.pow(y - points[e * 2 + 1], 2) < dc)
-                        return e;
+                    if (Math.pow(x - points[e * 2], 2) + Math.pow(y - points[e * 2 + 1], 2) < dc) return e;
                 }
                 break;
             }

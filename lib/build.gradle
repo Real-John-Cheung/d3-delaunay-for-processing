@@ -9,6 +9,8 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'java'
 }
 
 repositories {
@@ -17,20 +19,6 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-configurations {
-    // A configuration meant for consumers that need the API of this component
-    exposedApi {
-        // This configuration is an "outgoing" configuration, it's not meant to be resolved
-        canBeResolved = false
-        // As an outgoing configuration, explain that consumers may want to consume it
-        canBeConsumed = true
-    }
-    // A configuration meant for consumers that need the implementation of this component
-    exposedRuntime {
-        canBeResolved = false
-        canBeConsumed = true
-    }
-}
 
 dependencies {
     // Use JUnit test framework.
@@ -41,6 +29,15 @@ dependencies {
     implementation 'com.google.guava:guava:30.0-jre'
 
 	api 'com.github.waveware4ai:delaunator-java:78b776f435'
+}
+
+shadowJar {
+   archiveBaseName.set('d3Delaunay')
+   archiveClassifier.set('')
+   archiveVersion.set('')
+   dependencies{
+       include(dependency('com.github.waveware4ai:delaunator-java:78b776f435'))
+   }
 }
 
 compileJava {
