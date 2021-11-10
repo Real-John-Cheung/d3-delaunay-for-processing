@@ -180,7 +180,8 @@ public class Voronoi {
         List<Integer> result = new ArrayList<Integer>();
         double[] ci = this._clip(i);
         if (ci != null) {
-            for (int j : this.delaunay.neighbors(i)) {
+            for (int ind = 0; ind < this.delaunay.neighbors(i).length; ind++) {
+                int j = this.delaunay.neighbors(i)[ind];
                 double[] cj = this._clip(j);
                 if (cj != null) {
                     int li = ci.length;
