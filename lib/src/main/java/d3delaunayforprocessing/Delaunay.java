@@ -306,11 +306,14 @@ public class Delaunay {
         context.closePath();
     }
     
-    /* TODO
-    public T[] trianglePolygons(){
-    
+    public double[][][] trianglePolygons() {
+        List<double[][]> res = new ArrayList<double[][]>();
+        int[] triangles = this.triangles;
+        for (int i = 0; i < triangles.length / 3; i++) {
+            res.add(this.trianglePolygon(i));
+        }
+        return res.toArray(new double[0][0][2]);
     }
-    */
     
     public double[][] trianglePolygon(int i) {
         Polygon polygon = new Polygon();
