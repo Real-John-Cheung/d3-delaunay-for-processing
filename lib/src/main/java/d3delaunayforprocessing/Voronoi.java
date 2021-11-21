@@ -178,7 +178,7 @@ public class Voronoi {
         return this.delaunay._step(i, x, y) == i;
     }
 
-    public int[] neighbours(int i) {
+    public int[] neighbors(int i) {
         List<Integer> result = new ArrayList<Integer>();
         double[] ci = this._clip(i);
         if (ci != null) {

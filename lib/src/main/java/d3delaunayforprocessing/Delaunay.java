@@ -185,7 +185,7 @@ public class Delaunay {
         List<Integer> result = new ArrayList<Integer>();
 
         if (collinear != null) {
-            int l = Arrays.asList(collinear).indexOf(i);
+            int l = indexOfIntArray(collinear, i);
             if (l > 0){
                 result.add(collinear[l - 1]);
             } else if (l < collinear.length - 1) {
@@ -319,6 +319,17 @@ public class Delaunay {
         Polygon polygon = new Polygon();
         this.renderTriangle(i, polygon);
         return polygon.value();
+    }
+
+    public static int indexOfIntArray(int[] array, int key) {
+        int returnvalue = -1;
+        for (int i = 0; i < array.length; ++i) {
+            if (key == array[i]) {
+                returnvalue = i;
+                break;
+            }
+        }
+        return returnvalue;
     }
 }
 
