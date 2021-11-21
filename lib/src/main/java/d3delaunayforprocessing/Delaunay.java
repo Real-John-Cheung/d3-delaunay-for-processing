@@ -188,8 +188,10 @@ public class Delaunay {
             int l = indexOfIntArray(collinear, i);
             if (l > 0){
                 result.add(collinear[l - 1]);
+                System.out.println("Delaunay.neighbors() BP1" );
             } else if (l < collinear.length - 1) {
                 result.add(collinear[l + 1]);
+                System.out.println("Delaunay.neighbors() BP2" );
             } else {
                 return result.stream().mapToInt(ii -> ii).toArray();
             }
@@ -206,12 +208,11 @@ public class Delaunay {
             if (triangles[e] != i) return result.stream().mapToInt(ii -> ii).toArray();
             e = halfedges[e];
             if (e == -1) {
-                int p = hull[(_hullIndex[i] + 1) % hull.length];
+                int p = hull[(_hullIndex[i] + 1 + hull.length) % hull.length];
                 if (p != p0) {
-                    result.add(p);
-                } else {
-                    return result.stream().mapToInt(ii -> ii).toArray();
+                    result.add(p);  
                 }
+                return result.stream().mapToInt(ii -> ii).toArray();
             }
         } while (e != e0);
         return result.stream().mapToInt(ii -> ii).toArray();
