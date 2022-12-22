@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<head>
+    <title>D3 Delaunay for processing</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1 id="d3-delaunay-for-processing">d3-delaunay-for-processing</h1>
+<p>To port the <a href="https://github.com/d3/d3-delaunay">d3-delaunay library</a> to Java
+using the <a href="https://github.com/waveware4ai/delaunator-java">delaunator-java library by waveware4ai</a></p>
+<p>V1.1: added new float APIs</p>
+<p>Tested with Processing 4 on macOS (Intel x64) and Windows10/11</p>
+<hr>
+
+<h2 id="usage">Usage</h2>
+<p>You can download the package from the <a href="./d3Delaunay.zip">here</a>, then import it into processing as a library. (you might need the newest Processing 4 to use it)
+Or you can also build it from source. I am using gradle to package it. To do so:<br>
+clone the repo to your machine:<br><code> git clone <a href="https://github.com/Real-John-Cheung/d3-delaunay-for-processing.git">https://github.com/Real-John-Cheung/d3-delaunay-for-processing.git</a> </code><br>
+after that, you can make some change according to your needs and run
+<code> gradle clean shadowJar</code> 
+to build the library.
+Packed <code>.jar</code> file will be in <code>./lib/build/libs</code></p>
+<hr>
+
+<h2 id="apis">APIs</h2>
+see <a href="./javadoc/">here</a>
+<hr>
+<h1>Example</h1>
+<a href="./example/example.pde">Download the pde file here.</a>
+<pre>
+    <code>
+import d3delaunayforprocessing.*;
+
+double[] points = new double[40];
+
+
+void setup() {
+  size(600,600);
+  for (int i = 0; i < points.length; i ++){
+    points[i] = random(10,590);
+  }
+  Delaunay d = new Delaunay(points);
+  background(255);
+  noFill();
+  stroke(0);
+  strokeWeight(3);
+  for (int i = 0; i < points.length; i +=2){
+    point((float)points[i], (float)points[i+1]);
+  }
+  strokeWeight(0.5);
+  Voronoi v = d.voronoi(new double[] {0,0,width,height});
+  for (int i = 0; i < points.length/2; i ++){
+    double[][] cell = v.cellPolygon(i);
+    if (cell == null) continue;
+    beginShape();
+    for (int j = 0; j < cell.length; j ++){
+      vertex((float)cell[j][0],(float)cell[j][1]);
+    }
+    endShape();
+  }
+  stroke(255,0,0);
+  double[][][] triangles = d.trianglePolygons();
+  for(int i = 0; i < triangles.length; i ++) {
+    double[][] tri = triangles[i];
+    beginShape();
+    for (int j = 0; j < tri.length; j ++) {
+      double[] p = tri[j];
+      vertex((float)p[0], (float)p[1]);
+    }
+    endShape();
+  }
+}
+
+    </code>
+</pre>
+<hr>
+<h1>Source Code</h1>
+<p>On github, <a href="https://github.com/Real-John-Cheung/d3-delaunay-for-processing">https://github.com/Real-John-Cheung/d3-delaunay-for-processing</a></p>
+<hr>
+<p>By <a href="https://johncheung.art">John C</a></p>
+</body>
