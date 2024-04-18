@@ -253,11 +253,25 @@ public class Voronoi {
         return re;
     }
 
-    /*
-     * public void _renderSegment(){
-     * 
-     * }
+    /**
+     * return the correct segment to render
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @return segment[x0, y0, x1, y1]
      */
+    public double[] _renderSegment(double x0, double y0, double x1, double y1){
+        int c0 = this._regioncode(x0, y0);
+        int c1 = this._regioncode(x1, y1);
+        if (c0 == 0 && c1 == 0) {
+            return new double[] { x0, y0, x1, y1 };
+        } else {
+            double[] s = this._clipSegment(x0, y0, x1, y1, c0, c1);
+            return s;
+        }
+    }
+     
 
     /**
      * Returns true if the cell with the specified index i contains the specified
