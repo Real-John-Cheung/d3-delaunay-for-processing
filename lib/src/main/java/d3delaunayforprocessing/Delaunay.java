@@ -39,7 +39,7 @@ public class Delaunay {
      * the incoming halfedge is on the convex hull; for other points, the choice of
      * incoming halfedge is arbitrary.
      */
-    public int[] indeges;
+    public int[] inedges;
     public int[] _hullIndex;
     /**
      * An 1D double array of all the points input. Like this [ x0, y0, x1, y1, ...]
@@ -140,7 +140,7 @@ public class Delaunay {
             dps[i] = new DPoint(points[i * 2], points[i * 2 + 1]);
         }
         this._delaunator = new Delaunator(dps);
-        this.indeges = new int[points.length / 2];
+        this.inedges = new int[points.length / 2];
         this._hullIndex = new int[points.length / 2];
         DPoint[] dPoints = this._delaunator.points;
         this.points = new double[dPoints.length * 2];
@@ -168,7 +168,7 @@ public class Delaunay {
             dps[i] = new DPoint(da[i * 2], da[i * 2 + 1]);
         }
         this._delaunator = new Delaunator(dps);
-        this.indeges = new int[da.length / 2];
+        this.inedges = new int[da.length / 2];
         this._hullIndex = new int[da.length / 2];
         DPoint[] dPoints = this._delaunator.points;
         this.points = new double[dPoints.length * 2];
@@ -227,10 +227,10 @@ public class Delaunay {
         int[] hull = this.hull;
         this.triangles = this._delaunator.triangles;
         int[] triangles = this.triangles;
-        for (int i = 0; i < this.indeges.length; i++) {
-            this.indeges[i] = -1;
+        for (int i = 0; i < this.inedges.length; i++) {
+            this.inedges[i] = -1;
         }
-        int[] indeges = this.indeges;
+        int[] inedges = this.inedges;
         for (int i = 0; i < this._hullIndex.length; i++) {
             this._hullIndex[i] = -1;
         }
@@ -238,8 +238,8 @@ public class Delaunay {
         int n = halfedges.length;
         for (int e = 0; e < n; ++e) {
             int p = triangles[e % 3 == 2 ? e - 2 : e + 1];
-            if (halfedges[e] == -1 || indeges[p] == -1)
-                indeges[p] = e;
+            if (halfedges[e] == -1 || inedges[p] == -1)
+                inedges[p] = e;
         }
         for (int i = 0; i < hull.length; i++) {
             hullIndex[hull[i]] = i;
@@ -248,9 +248,9 @@ public class Delaunay {
             this.triangles = new int[] { -1, -1, -1 };
             this.halfedges = new int[] { -1, -1, -1 };
             this.triangles[0] = hull[0];
-            indeges[hull[0]] = 1;
+            inedges[hull[0]] = 1;
             if (hull.length == 2) {
-                indeges[hull[1]] = 0;
+                inedges[hull[1]] = 0;
                 this.triangles[1] = hull[1];
                 this.triangles[2] = hull[2];
             }
@@ -305,7 +305,7 @@ public class Delaunay {
      */
 
     public int[] neighbors(int i) {
-        int[] indeges = this.indeges;
+        int[] inedges = this.inedges;
         int[] hull = this.hull;
         int[] hullIndex = this._hullIndex;
         int[] halfedges = this.halfedges;
@@ -326,7 +326,7 @@ public class Delaunay {
             }
         }
 
-        int e0 = indeges[i];
+        int e0 = inedges[i];
         if (e0 == -1)
             return result.stream().mapToInt(ii -> ii).toArray();
         int e = e0;
@@ -414,17 +414,17 @@ public class Delaunay {
      * @return int
      */
     public int _step(int i, double x, double y) {
-        int[] indeges = this.indeges;
+        int[] inedges = this.inedges;
         int[] hull = this.hull;
         int[] _hullIndex = this._hullIndex;
         int[] halfedges = this.halfedges;
         int[] triangles = this.triangles;
         double points[] = this.points;
-        if (indeges[i] == -1 || points.length == 0)
+        if (inedges[i] == -1 || points.length == 0)
             return (i + 1) % (points.length >> 1);
         int c = i;
         double dc = Math.pow(x - points[i * 2], 2) + Math.pow(y - points[i * 2 + 1], 2);
-        int e0 = indeges[i];
+        int e0 = inedges[i];
         int e = e0;
         do {
             int t = triangles[e];

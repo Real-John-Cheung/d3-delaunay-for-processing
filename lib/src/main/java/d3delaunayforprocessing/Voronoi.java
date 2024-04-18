@@ -323,10 +323,10 @@ public class Voronoi {
 
     public double[] _cell(int i) {
         double[] circumcenters = this.circumcenters;
-        int[] indeges = this.delaunay.indeges;
+        int[] inedges = this.delaunay.inedges;
         int[] halfedges = this.delaunay.halfedges;
         int[] triangles = this.delaunay.triangles;
-        int e0 = indeges[i];
+        int e0 = inedges[i];
         if (e0 == -1)
             return null;
         List<Double> points = new ArrayList<Double>();
